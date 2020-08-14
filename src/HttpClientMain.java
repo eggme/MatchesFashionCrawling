@@ -29,7 +29,7 @@ import org.jsoup.select.Elements;
 public class HttpClientMain {
 
 	public static CloseableHttpClient client;
-	public static final String CATEGORY = "CLOTHING";
+	public static final String CATEGORY = "SHOES";
 	public static final String fileNameSQL = CATEGORY+".sql"; 
 	
 	/**
@@ -46,7 +46,7 @@ public class HttpClientMain {
 	 */
 	public static void main(String[] args) {
 		try {
-			Document doc = Jsoup.connect("https://www.matchesfashion.com/en-kr/womens/shop/clothing").get();
+			Document doc = Jsoup.connect("https://www.matchesfashion.com/en-kr/womens/shop/"+CATEGORY).get();
 			Elements contents = doc.select("img.lazy");
 			List<String> list = new ArrayList<String>();
 			List<ProductDTO> _list = new ArrayList<ProductDTO>();
@@ -58,23 +58,24 @@ public class HttpClientMain {
 				int length = Integer.parseInt(contents.get(i).attr("data-image-length"));
 				temp = "http://"+temp.substring(2, temp.length());
 				String productImgPath = temp.substring(temp.lastIndexOf("/"), temp.length());
-				list.add(temp);
+				//list.add(temp);
 				String zoom = temp.replace("large", "zoom");
-				list.add(zoom);
+				//list.add(zoom);
 				String smallsize = temp.replace("_large", "");
 				smallsize = smallsize.replace("/product/", "/product/66/");
 				list.add(smallsize);
 				for(int q = 1;q<length;q++) {
 					temp = temp.replace("_"+q+"_", "_"+(q+1)+"_");
-					list.add(temp);
+					//list.add(temp);
 					zoom = temp.replace("large", "zoom");
-					list.add(zoom);
+					//list.add(zoom);
 					smallsize = temp.replace("_large", "");
 					smallsize = smallsize.replace("/product/", "/product/66/");
 					list.add(smallsize);
 				}
 				dto.setProductCode(productCode);
-				dto.setProductImgPath("/img/product"+productImgPath);
+				dto.setProductImgPath("./img/product/shoes"+productImgPath);
+				//System.out.println(dto.getProductImgPath());
 				dto.setProductCategory(CATEGORY);
 				dto.setProductImageLength(length);
 				_list.add(dto);
@@ -96,8 +97,7 @@ public class HttpClientMain {
 				ProductDTO dto = _list.get(i);
 				dto.setProductPrice(content4.get(i).text());
 			}
-			saveQuery(_list);
-
+//			saveQuery(_list);
 			for(int i=0;i<list.size();i++) {
 				System.out.println("start to save Image ===> " + i + "   --- length ===> "+list.size() );
 				saveImage(list.get(i));
@@ -110,7 +110,7 @@ public class HttpClientMain {
 	
 	public static void saveQuery(List<ProductDTO> list) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kyyet\\eclipse-workspace\\MatchesFashionCrawling\\sql\\"+fileNameSQL));
+			BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kyyet\\git\\MatchesFashionCrawling\\sql\\"+fileNameSQL));
 			for(int i=0;i<list.size();i++) {
 				writer.write(list.get(i).getQuery()+"\n");
 			}
@@ -126,7 +126,7 @@ public class HttpClientMain {
 			String fileName = url.substring(url.lastIndexOf("/"), url.length());
 			URL _url = new URL(url);
 			InputStream in = _url.openStream();
-			OutputStream out = new FileOutputStream("C:\\Users\\kyyet\\eclipse-workspace\\MatchesFashionCrawling\\src\\imgs\\"+fileName);
+			OutputStream out = new FileOutputStream("C:\\Users\\kyyet\\git\\MatchesFashionCrawling\\src\\imgs\\"+fileName);
 			while(true) {
 				int data = in.read();
 				if(data == -1) break;
